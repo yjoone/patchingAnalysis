@@ -54,14 +54,6 @@ for j = 1:2
 end
 
 
-%% compute rejection criteria for each trial
-for i = 1:2:20
-[fitobject,gof,output] = fit(x',data1(4100:8100,i,2),'exp2');
-res = output.residuals;
-res_std = res./std_v_f;
-max(abs(res_std))
-end
-
 
 % figure;
 % for j = 1:length(trial_temp)
