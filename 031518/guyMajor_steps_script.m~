@@ -1,6 +1,4 @@
 % This script is to follow 1994 Guy major paper
-clear all;
-close all;
 
 load('/Users/JimKwon/Google Drive/Tutor/Edyta/Lesson_4/Traces.mat');
 
@@ -25,19 +23,13 @@ data_n_delta = data_n - mean(data_n,2);
 dataAvg_p = mean(data_p,2);
 dataAvg_n = mean(data_n,2);
 
-[~,plen] = size(data_p);
-[~,nlen] = size(data_n);
-
-
-
 %% filter the data
 
 
 
 %% compute SE (D)
-
-se_p_rms = rms(std(data_p,[],2)/sqrt(plen),2);
-se_n_rms = rms(std(data_n,[],2)/sqrt(nlen),2);
+se_p = std(data_p,[],2)/sqrt(length(data_p));
+se_n = std(data_n,[],2)/sqrt(length(data_n));
 
 %% plot the average trace for visual inspection in semi-log plot (E)
 % inspect visually
@@ -78,14 +70,11 @@ for i = 1:plen
     % run fit
     % [fitobject,gof,output] = fit(x',trace_fit,'linearinterp');
     [p,S] = polyfit(x',trace_fit,1);
-    [y,delta] = polyval(p,x,S);
     
-    % compute the residual
-    res = abs(y'-trace_fit);
+    figure; plot(fitobject,x',trace_fit) % plot the fitting
     
-    % figure; plot(fitobject,x',trace_fit) % plot the fitting
-    % res = output.residuals;
-    res_se = res./se_p_rms(trace_i);
+    res = output.residuals;
+    res_se = res./se_p(trace_i);
     max(abs(res_se))
     
 end
