@@ -7,6 +7,12 @@ load('/Users/JimKwon/Google Drive/Tutor/Edyta/Lesson_4/Traces.mat');
 % peak to fit data offset is set at 5 ms, which is 100 data points
 offset = 100;
 
+%%%%%%%%%%%%% Default variables %%%%%%%%%%%%%%
+trace_fit_duration = 4000;
+trace_start_i = 16084;
+trace_duration = 800;
+sampleRate = 20000;
+
 
 %% compute the delta Vm
 
@@ -19,6 +25,12 @@ offset = 100;
 data_p = data1(:,1:2:11,2);
 data_n = data1(:,2:2:11,2);
 
+pm = mean(data_p,2);
+nm = mean(data_n,2);
+
+
+
+% data_p_delta = data_p - repmat(;
 data_p_delta = data_p - mean(data_p,2);
 data_n_delta = data_n - mean(data_n,2);
 
@@ -64,17 +76,30 @@ for i = 1:plen
     vData_f = filtfilt(b,a,vData); % trace_f is filtered trace
     
     % check the new filtered trace
-    % figure; plot(vData_f);
+    figure; plot(vData_f);
     %% fit it with exp2 function
     
     % extract only the 200ms trace based on the figure
-    % trace_i = ((4000+offset):(4000+offset+4000));
-    trace_i = (1:4001);
-    trace_fit = vData_f(trace_i);
+    % trace_fit = trace_f(4084:4084+4000);
+    trace_fit = vData_f(trace_start_i:(trace_start_i+trace_fit_duration));
     
     % create an x variable for the fitting function input
-    x = 0:(200/4000):200; % this should go from 0 to 200ms with same number of points in between as trace_fit
-
+    x = 0:(200/trace_fit_duration):200; % this should go from 0 to 200ms with same number of points in between as trace_fit
+    
+    % run fit
+    [fitobject,gof,output] = fit(x',trace_fit,'exp2');
+    
+    figure; plot(fitobject,x,trace_fit) % plot the fitting
+    
+    %
+    %     % extract only the 200ms trace based on the figure
+    %     trace_i = ((4000+offset):(4000+offset+4000));
+    %     % trace_i = (1:4001);
+    %     trace_fit = vData_f(trace_i);
+    %
+    %     % create an x variable for the fitting function input
+    %     x = 0:(200/4000):200; % this should go from 0 to 200ms with same number of points in between as trace_fit
+    
     % run fit
     % [fitobject,gof,output] = fit(x',trace_fit,'linearinterp');
     [p,S] = polyfit(x',trace_fit,1);
@@ -85,6 +110,7 @@ for i = 1:plen
     
     % figure; plot(fitobject,x',trace_fit) % plot the fitting
     % res = output.residuals;
+    % res_se = res./se_p_rms(trace_i);
     res_se = res./se_p_rms(trace_i);
     max(abs(res_se))
     
